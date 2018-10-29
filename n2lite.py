@@ -2,71 +2,81 @@
 
 import sqlite3
 
-__version__ = "0.0.1"
+__version__ = "0.1.0"
 
 
 class N2lite(object):
     
-    def __init__(self):
-        pass
-
-    def open_connection(self, dbpath):
+    def __init__(self, dbpath):
         """
         example:
             dbpath = "/home/amigos/data/logger/sample.db"
         """
-        connection = sqlite3.connect(dbpath)
-        return connection
-
-    def make_cursor(self, connection):
+        self.dbpath = dbpath
+        self.con = sqlite3.connect(self.dbpath)
+        pass
+    
+    def __del__(self):
+        self.con.close()
+        return
+    
+    def open(self):
         """
-        example:
-            connection = open_connection(dbpath)
+        for multithread, because sqlite cannnot connect beyond thread.
         """
-        cursor = connection.cursor()
-        return cursor
+        self.con = sqlite3.connect(self.dbpath)
 
-    def commit_data(self, connection):
-        connection.commit()
+    def close(self):
+        self.con.close()
         return
 
-    def close_connection(self, connection):
-        connection.close()
+    def commit_data(self):
+        self.con.commit()
         return
 
-    def make_table(self, cursor, table_name, param):
+    def make_table(self, table_name, param):
         """
         example:
-            cursor = make_cursor(connection)
             table_name = "SIS_VOLTAGE"
-            param = ('2l' float, '2r' float, ... )
+            param = "('2l' float, '2r' float, time float, ... )"
         """
-        cursor.execute("CREATE table if not exists {} {}".format(table_name, param))
+        self.con.execute("CREATE table if not exists {} {}".format(table_name, param))
         return
 
-    def write(self, cursor, table_name, param, values):
+    def write(self, table_name, param, values, auto_commit = True):
         """
         example:
-            cursor = make_cursor(connection)
             table_name = "SIS_VOLTAGE"
             param = "('2l', '2r')" or '' (all param write)
-            values = (1.0, 2.0) 
+            values = (1.0, 2.0)
+
+            if autocommit = False, you must call commit_data function 
+                after calling write function.
         """
-        cursor.execute("INSERT into {0} {1} values {2}".format(table_name, param, str(values)))
+        if auto_commit:
+            with self.con:
+                self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, str(values)))
+        else:
+            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, str(values)))
         return
 
-    def read(self, cursor, table_name, param):
+    def read(self, table_name, param):
         """
         example:
-            cursor = make_cursor(connection)
             table_name = "SIS_VOLTAGE"
-            param = '2l' or '*' (all param read)  # TODO: multi param reading
+            param = "'2l', '2r', time" or "*" (all param read)
+        return:
+            [['2l', '2r', 'time'], [1.2, 1.3, .....]]
         """
-        row = cursor.execute("SELECT {0} from {1}".format(param, table_name))
-        data = row.fetchall()
+        row = self.con.execute("SELECT {0} from {1}".format(param, table_name)).fetchall()
+        
+        data = [
+                [row[i][j] for i in range(len(row))] 
+                    for j in range(len(row[0]))
+                    ]
         return data
 
-    def check_table(self, cursor):
+    def check_table(self):
         """
         get information about all table
         example:
@@ -76,6 +86,6 @@ class N2lite(object):
             rootpage = 3
             sql = CREATE TABLE SIS_VOLTAGE ('2l', '2r')
         """
-        row = cursor.execute("SELECT * from sqlite_master")
+        row = self.con.execute("SELECT * from sqlite_master")
         info = row.fetchall()
         return info
