@@ -13,7 +13,7 @@ class N2lite(object):
             dbpath = "/home/amigos/data/logger/sample.db"
         """
         self.dbpath = dbpath
-        self.con = sqlite3.connect(self.dbpath)
+        self.con = sqlite3.connect(self.dbpath, check_same_thread=False)
         pass
     
     def __del__(self):
@@ -24,7 +24,7 @@ class N2lite(object):
         """
         for multithread, because sqlite cannnot connect beyond thread.
         """
-        self.con = sqlite3.connect(self.dbpath)
+        self.con = sqlite3.connect(self.dbpath, check_same_thread=False)
 
     def close(self):
         self.con.close()
