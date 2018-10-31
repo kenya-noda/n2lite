@@ -2,7 +2,7 @@
 
 import sqlite3
 
-__version__ = "0.1.0"
+__version__ = "0.2.0"
 
 
 class N2lite(object):
@@ -60,20 +60,21 @@ class N2lite(object):
             self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, str(values)))
         return
 
-    def read(self, table_name, param):
+    def read(self, table_name, param="*"):
         """
         example:
             table_name = "SIS_VOLTAGE"
             param = "'2l', '2r', time" or "*" (all param read)
         return:
-            [['2l', '2r', 'time'], [1.2, 1.3, .....]]
+            [[1.2, 1.3, .....], [...]]
         """
         row = self.con.execute("SELECT {0} from {1}".format(param, table_name)).fetchall()
-        
-        data = [
+        if not row == []:
+            data = [
                 [row[i][j] for i in range(len(row))] 
                     for j in range(len(row[0]))
                     ]
+        else : data = []
         return data
 
     def check_table(self):
