@@ -1,8 +1,9 @@
 #!/usr/bin/env python3
 
 import sqlite3
+import pandas
 
-__version__ = "0.2.0"
+__version__ = "0.3.0"
 
 
 class N2lite(object):
@@ -79,6 +80,22 @@ class N2lite(object):
         else : data = []
         return data
 
+    def read_as_pandas(self, table_name):
+        """
+        example:
+            table_name = "SIS_VOLTAGE"
+        return:
+            pandas.core.frame.DataFrame
+        """
+        df = pandas.read_sql("SELECT * from {}".format(table_name), self.con)
+        return df
+
+    def read_pandas_all(self):
+        table_name = self.get_table_name()
+        datas = [self.read_as_pandas(name) for name in table_name]
+        df_all = pandas.concat(datas, axis=1)
+        return df_all
+
     def check_table(self):
         """
         get information about all table
@@ -92,3 +109,13 @@ class N2lite(object):
         row = self.con.execute("SELECT * from sqlite_master")
         info = row.fetchall()
         return info
+
+    def get_table_name(self):
+        """
+        get names of tables
+        example:
+            ["SIS_VOLTAGE", "time", ...]
+        """
+        name = self.con.execute("SELECT name from sqlite_master where type='table'").fetchall()
+        name_list = [name[i][0] for i in range(len(name))]
+        return name_list
