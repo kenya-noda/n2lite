@@ -3,7 +3,7 @@
 import sqlite3
 import pandas
 
-__version__ = "0.3.0"
+__version__ = "0.3.1"
 
 
 class N2lite(object):
@@ -93,8 +93,12 @@ class N2lite(object):
     def read_pandas_all(self):
         table_name = self.get_table_name()
         datas = [self.read_as_pandas(name) for name in table_name]
-        df_all = pandas.concat(datas, axis=1)
-        return df_all
+        if datas ==[]:
+            return df_all=[]
+
+        else:
+            df_all = pandas.concat(datas, axis=1)
+            return df_all
 
     def check_table(self):
         """
