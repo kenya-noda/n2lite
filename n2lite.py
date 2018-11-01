@@ -54,13 +54,11 @@ class N2lite(object):
             if autocommit = False, you must call commit_data function 
                 after calling write function.
         """
-        print(values)
         if auto_commit:
             with self.con:
-                print("INSERT into {0} {1} values {2}".format(table_name, param, values))
                 self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
         else:
-            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, tuple(values)))
+            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
         return
 
     def read(self, table_name, param="*"):
