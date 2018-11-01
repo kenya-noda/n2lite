@@ -92,11 +92,10 @@ class N2lite(object):
         table_name = self.get_table_name()
         datas = [self.read_as_pandas(name) for name in table_name]
         if datas ==[]:
-            return df_all=[]
-
+            df_all = []
         else:
             df_all = pandas.concat(datas, axis=1)
-            return df_all
+        return df_all
 
     def check_table(self):
         """
