@@ -44,7 +44,7 @@ class N2lite(object):
         self.con.execute("CREATE table if not exists {} {}".format(table_name, param))
         return
 
-    def write(self, table_name, param, values, auto_commit = True):
+    def write(self, table_name, param, values, auto_commit = False):
         """
         example:
             table_name = "SIS_VOLTAGE"
@@ -60,7 +60,7 @@ class N2lite(object):
                 print("INSERT into {0} {1} values {2}".format(table_name, param, values))
                 self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
         else:
-            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, tuple(values)))
+            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
         return
 
     def read(self, table_name, param="*"):
