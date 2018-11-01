@@ -48,16 +48,18 @@ class N2lite(object):
         example:
             table_name = "SIS_VOLTAGE"
             param = "('2l', '2r')" or '' (all param write)
-            values = (1.0, 2.0)
+            values = "(1.0, 2.0)"
 
             if autocommit = False, you must call commit_data function 
                 after calling write function.
         """
+        print(values)
         if auto_commit:
             with self.con:
-                self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, str(values)))
+                print("INSERT into {0} {1} values {2}".format(table_name, param, values))
+                self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
         else:
-            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, str(values)))
+            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, tuple(values)))
         return
 
     def read(self, table_name, param="*"):
