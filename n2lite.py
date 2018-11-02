@@ -70,6 +70,8 @@ class N2lite(object):
 
             if autocommit = False, you must call commit_data function 
                 after calling write function.
+
+            if value's type = list, need  ",".join(map(str, value)).
         """
         if auto_commit:
             with self.con:
