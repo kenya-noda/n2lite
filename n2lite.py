@@ -3,7 +3,7 @@
 import sqlite3
 import pandas
 
-__version__ = "0.3.1"
+__version__ = "0.4.0"
 
 
 class N2lite(object):
@@ -50,6 +50,23 @@ class N2lite(object):
             table_name = "SIS_VOLTAGE"
             param = "('2l', '2r')" or '' (all param write)
             values = "(1.0, 2.0)"
+
+            if autocommit = False, you must call commit_data function 
+                after calling write function.
+        """
+        if auto_commit:
+            with self.con:
+                self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
+        else:
+            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
+        return
+
+    def writemany(self, table_name, param, values, auto_commit = False):
+        """
+        example:
+            table_name = "SIS_VOLTAGE"
+            param = "('2l', '2r')" or '' (all param write)
+            values = "(1.0, 2.0), (1.1, 2.2)"
 
             if autocommit = False, you must call commit_data function 
                 after calling write function.
