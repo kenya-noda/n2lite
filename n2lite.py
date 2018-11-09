@@ -3,7 +3,7 @@
 import sqlite3
 import pandas
 
-__version__ = "0.4.0"
+__version__ = "0.5.0"
 
 
 class N2lite(object):
@@ -49,16 +49,22 @@ class N2lite(object):
         example:
             table_name = "SIS_VOLTAGE"
             param = "('2l', '2r')" or '' (all param write)
-            values = "(1.0, 2.0)"
+            values = (1.0, 2.0)
 
             if autocommit = False, you must call commit_data function 
                 after calling write function.
         """
+        if len(values) == 1:
+            quest = "?"
+        else:
+            tmp = ""
+            quest = ",".join([tmp + "?" for i in range(len(values))])
+
         if auto_commit:
             with self.con:
-                self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
+                self.con.execute("INSERT into {0} {1} values ({2})".format(table_name, param, quest), values)
         else:
-            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
+            self.con.execute("INSERT into {0} {1} values ({2})".format(table_name, param, quest), values)
         return
 
     def writemany(self, table_name, param, values, auto_commit = False):
@@ -66,18 +72,24 @@ class N2lite(object):
         example:
             table_name = "SIS_VOLTAGE"
             param = "('2l', '2r')" or '' (all param write)
-            values = "(1.0, 2.0), (1.1, 2.2)"
+            values = [(1.0, 2.0), (1.1, 2.2)]
 
             if autocommit = False, you must call commit_data function 
                 after calling write function.
 
             if value's type = list, need  ",".join(map(str, value)).
         """
+        if len(values[0]) == 1:
+            quest = "?"
+        else:
+            tmp = ""
+            quest = ",".join([tmp + "?" for i in range(len(values[0]))])
+
         if auto_commit:
             with self.con:
-                self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
+                self.con.executemany("INSERT into {0} {1} values ({2})".format(table_name, param, quest), values)
         else:
-            self.con.execute("INSERT into {0} {1} values {2}".format(table_name, param, values))
+            self.con.executemany("INSERT into {0} {1} values ({2})".format(table_name, param, quest), values)
         return
 
     def read(self, table_name, param="*"):
