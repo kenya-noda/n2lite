@@ -1,10 +1,10 @@
 #!/usr/bin/env python3
 
 import sqlite3
+import pickle
 import pandas
 
 __version__ = "0.5.0"
-
 
 class N2lite(object):
     
@@ -26,6 +26,7 @@ class N2lite(object):
         for multithread, because sqlite cannnot connect beyond thread.
         """
         self.con = sqlite3.connect(self.dbpath, check_same_thread=False)
+        return
 
     def close(self):
         self.con.close()
@@ -59,6 +60,14 @@ class N2lite(object):
         else:
             tmp = ""
             quest = ",".join([tmp + "?" for i in range(len(values))])
+
+        val = []
+        for i in range(len(values)):
+            if type(values[i]) == list:
+                val.append(pickle.dumps(values[i]))
+            else:
+                val.append(values[i])
+        values = tuple(val)
 
         if auto_commit:
             with self.con:
@@ -107,7 +116,15 @@ class N2lite(object):
                     for j in range(len(row[0]))
                     ]
         else : data = []
-        return data
+        
+        dat = []
+        for i in range(len(data)):
+            if type(data[i][0]) == bytes:
+                dat.append([pickle.loads(data[i][j]) for j in range(len(data[i]))])
+            else:
+                dat.append(data[i])
+
+        return dat
 
     def read_as_pandas(self, table_name):
         """
